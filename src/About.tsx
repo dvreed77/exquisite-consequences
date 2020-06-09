@@ -2,7 +2,7 @@ import React from "react";
 
 export function About() {
   return (
-    <div className="text-xl text-gray-700">
+    <div className="text-xl text-gray-700 overflow-auto">
       <p className="mt-6">
         <i>Exquisite Consequences</i> is an experiment in Generative Art.
       </p>
@@ -12,7 +12,10 @@ export function About() {
       </p>
       <p className="mt-6">
         Typically{" "}
-        <a href="https://en.wikipedia.org/wiki/Generative_art">
+        <a
+          className="no-underline hover:underline text-blue-500"
+          href="https://en.wikipedia.org/wiki/Generative_art"
+        >
           Generative Art
         </a>{" "}
         involves an artist handing an artistic process over to an computer
@@ -26,10 +29,13 @@ export function About() {
       </p>
       <p className="mt-6">
         The name <i>Exquisite Consequences</i> is a nod to the artistic method{" "}
-        <a href="https://en.wikipedia.org/wiki/Exquisite_corpse">
+        <a
+          className="no-underline hover:underline text-blue-500"
+          href="https://en.wikipedia.org/wiki/Exquisite_corpse"
+        >
           Exquisite corpse
         </a>{" "}
-        and the associated parlour game, Consequences in which people work
+        and the associated parlour game, Consequences, in which people work
         together, cooperatively to generate a piece of work.
       </p>
 

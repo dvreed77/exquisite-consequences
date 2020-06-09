@@ -85,19 +85,16 @@ export function DrawingArea({
     if (window.TouchEvent && event.nativeEvent instanceof TouchEvent) {
       cX = event.nativeEvent.touches[0].clientX;
       cY = event.nativeEvent.touches[0].clientY;
-    } else {
+    } else if (event.nativeEvent instanceof MouseEvent) {
       cX = event.nativeEvent.clientX;
       cY = event.nativeEvent.clientY;
+    } else {
+      return;
     }
     if (drawingOn) {
       const node = canvasRef.current;
       if (node) {
-        const {
-          x: rX,
-          y: rY,
-          width: rW,
-          height: rH,
-        } = node.getBoundingClientRect();
+        const { x: rX, y: rY } = node.getBoundingClientRect();
         const x = cX - rX;
         const y = cY - rY;
         setStroke((stroke: number[][]) => {
