@@ -30,6 +30,7 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
           const data = doc.data();
           setLastStroke(JSON.parse(data.stroke));
           setLastColor(data.color);
+          setColor(data.color);
           setLastText(data.text);
         });
       });

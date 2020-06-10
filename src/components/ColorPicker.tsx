@@ -11,7 +11,9 @@ export function ColorPicker({
   color: string;
   setColor: any;
 }) {
-  const colors = colorOptions(inputColor || "red");
+  const colors = React.useMemo(() => colorOptions(inputColor || "red"), [
+    inputColor,
+  ]);
 
   return (
     <div className="w-full">

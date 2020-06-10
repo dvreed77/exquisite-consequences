@@ -3,7 +3,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
-import firebase from "firebase";
+import firebase from "firebase/app";
+import "firebase/analytics";
+import "firebase/firestore";
+
 import { App } from "./App";
 
 const config = {

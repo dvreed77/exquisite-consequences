@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run watch:css & parcel src/index.html",
-    "watch:css": "postcss tailwind.css -o src/index.css -w"
+    "watch:css": "postcss tailwind.css -o src/index.css -w",
+    "build": "parcel build src/index.html",
+    "deploy": "npm run build && firebase deploy"
   },
   "keywords": [],
   "author": "",
@@ -13,11 +15,13 @@
   "dependencies": {
     "@types/classnames": "^2.2.10",
     "@types/color": "^3.0.1",
+    "@types/d3-random": "^1.1.2",
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.5",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
+    "d3-random": "^2.1.0",
     "firebase": "^7.15.0",
     "parcel-bundler": "^1.12.4",
     "postcss-cli": "^7.1.1",
