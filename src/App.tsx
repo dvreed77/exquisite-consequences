@@ -7,6 +7,7 @@ import { BottomNav } from "./components/BottomNav";
 import { About } from "./About";
 import { Final } from "./Final";
 import { Output } from "./Output";
+import { DrawingArea2 } from "./components/DrawingArea2";
 
 export function App({ db }: { db: firebase.firestore.Firestore }) {
   const [stroke, setStroke] = React.useState<number[][]>([]);
@@ -17,7 +18,7 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
   const [lastColor, setLastColor] = React.useState<string>("red");
   const [lastText, setLastText] = React.useState<string>("");
 
-  const [canvasSize, setCanvasSize] = React.useState<number>();
+  const [canvasSize, setCanvasSize] = React.useState<number>(300);
 
   React.useEffect(() => {
     db.collection("test")
@@ -26,7 +27,6 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-          console.log(doc.data());
           const data = doc.data();
           setLastStroke(JSON.parse(data.stroke));
           setLastColor(data.color);
@@ -64,7 +64,7 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
   }
 
   return (
-    <div className="lg:w-1/2 mx-3 lg:mx-auto flex flex-col">
+    <div className="lg:w-1/2 mx-3 lg:mx-auto flex flex-col select-none">
       <Router>
         <Link to="/">
           <h1 className="text-3xl text-center text-gray-800">
@@ -72,7 +72,7 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
           </h1>
         </Link>
 
-        <div className="flex-grow overflow-auto">
+        <div className="flex-grow overflow-auto select-none">
           <Switch>
             <Route exact path="/">
               <About />
@@ -84,12 +84,16 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
               <DrawingArea
                 lastColor={lastColor}
                 lastStroke={lastStroke}
+                canvasSize={canvasSize}
                 setCanvasSize={setCanvasSize}
                 stroke={setText}
                 setStroke={setStroke}
                 color={color}
                 setColor={setColor}
               />
+            </Route>
+            <Route exact path="/draw2">
+              <DrawingArea2 />
             </Route>
             <Route exact path="/output">
               <Output db={db} />

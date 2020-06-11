@@ -3,6 +3,7 @@ import { ColorPicker } from "./ColorPicker";
 
 export function DrawingArea({
   lastColor,
+  canvasSize,
   setCanvasSize,
   lastStroke,
   stroke,
@@ -11,6 +12,7 @@ export function DrawingArea({
   setColor,
 }: {
   lastColor: string;
+  canvasSize: number;
   setCanvasSize: any;
   lastStroke: any;
   stroke: any;
@@ -33,6 +35,7 @@ export function DrawingArea({
       canvas.width = clientSize;
       canvas.height = clientSize;
       setCanvasSize(clientSize);
+      drawCircles(clientSize);
     }
   }, []);
 
@@ -40,6 +43,32 @@ export function DrawingArea({
     drawLast(lastStroke);
   }, [lastStroke]);
 
+  function drawCircles(clientSize: number) {
+    const canvas = canvasRef.current;
+
+    if (canvas) {
+      const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+      const offset = 100;
+      const radius = 20;
+      context.beginPath();
+      context.arc(offset, offset, radius, 0, 2 * Math.PI);
+      context.strokeStyle = "red";
+      context.lineWidth = 4;
+      context.stroke();
+
+      context.beginPath();
+      context.arc(
+        clientSize - offset,
+        clientSize - offset,
+        radius,
+        0,
+        2 * Math.PI
+      );
+      context.strokeStyle = "red";
+      context.lineWidth = 4;
+      context.stroke();
+    }
+  }
   function drawLast(lastStroke: number[][]) {
     if (!lastStroke || lastStroke.length === 0) return;
 
@@ -62,21 +91,93 @@ export function DrawingArea({
       context.stroke();
     }
   }
-  function startDrawing() {
-    setStroke([]);
-
-    const canvas = canvasRef?.current;
-
-    if (canvas) {
-      const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      drawLast(lastStroke);
+  function startDrawing(event: React.TouchEvent | React.MouseEvent) {
+    let cX, cY;
+    event.persist();
+    if (window.TouchEvent && event.nativeEvent instanceof TouchEvent) {
+      cX = event.nativeEvent.touches[0].clientX;
+      cY = event.nativeEvent.touches[0].clientY;
+    } else if (event.nativeEvent instanceof MouseEvent) {
+      cX = event.nativeEvent.clientX;
+      cY = event.nativeEvent.clientY;
+    } else {
+      return;
     }
-    setDrawingOn(true);
+    const node = canvasRef.current;
+    if (node) {
+      const { x: rX, y: rY } = node.getBoundingClientRect();
+      const x = cX - rX;
+      const y = cY - rY;
+
+      const offset = 100;
+      const radius = 20;
+
+      const sX = offset;
+      const sY = offset;
+
+      const d = Math.sqrt(Math.pow(x - sX, 2) + Math.pow(y - sY, 2));
+
+      if (d < radius) {
+        setStroke([]);
+
+        const canvas = canvasRef?.current;
+
+        if (canvas) {
+          const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          drawLast(lastStroke);
+          drawCircles(canvasSize);
+        }
+        setDrawingOn(true);
+      }
+    }
   }
 
-  function stopDrawing() {
-    setDrawingOn(false);
+  function stopDrawing(event: React.TouchEvent | React.MouseEvent) {
+    let cX, cY;
+    event.persist();
+    if (window.TouchEvent && event.nativeEvent instanceof TouchEvent) {
+      cX = event.nativeEvent.touches[0].clientX;
+      cY = event.nativeEvent.touches[0].clientY;
+    } else if (event.nativeEvent instanceof MouseEvent) {
+      cX = event.nativeEvent.clientX;
+      cY = event.nativeEvent.clientY;
+    } else {
+      return;
+    }
+    const node = canvasRef.current;
+    if (node) {
+      const { x: rX, y: rY } = node.getBoundingClientRect();
+      const x = cX - rX;
+      const y = cY - rY;
+
+      const offset = 100;
+      const radius = 20;
+
+      const sX = canvasSize - offset;
+      const sY = canvasSize - offset;
+
+      const d = Math.sqrt(Math.pow(x - sX, 2) + Math.pow(y - sY, 2));
+
+      console.log(d);
+      if (d < radius) {
+      } else {
+        console.log("deleting stroke");
+
+        const canvas = canvasRef?.current;
+
+        if (canvas) {
+          const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          drawCircles(canvasSize);
+
+          setStroke([]);
+        }
+      }
+      setDrawingOn(false);
+    }
   }
 
   function draw(event: React.TouchEvent | React.MouseEvent) {

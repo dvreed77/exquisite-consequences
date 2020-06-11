@@ -50,6 +50,22 @@ export function BottomNav({ onSubmit }: { onSubmit: any }) {
         >
           Back
         </Link>
+        <Link
+          to={"/draw2"}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded leading-normal text-base ml-1"
+        >
+          Next
+        </Link>
+      </div>
+    ),
+    "/draw2": (
+      <div>
+        <Link
+          to={"/draw"}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded leading-normal text-base mr-1"
+        >
+          Back
+        </Link>
         <button
           onClick={onClick}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded leading-normal text-base ml-1"
