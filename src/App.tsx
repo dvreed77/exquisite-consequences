@@ -8,6 +8,9 @@ import { About } from "./About";
 import { Final } from "./Final";
 import { Output } from "./Output";
 import { DrawingArea2 } from "./components/DrawingArea2";
+import { getInputBezier } from "./utils/getInitialBezierCurve";
+import { Output2 } from "./Output2";
+import { prompts } from "./prompts";
 
 export function App({ db }: { db: firebase.firestore.Firestore }) {
   const [stroke, setStroke] = React.useState<number[][]>([]);
@@ -17,6 +20,16 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
   const [lastStroke, setLastStroke] = React.useState<number[][]>([]);
   const [lastColor, setLastColor] = React.useState<string>("red");
   const [lastText, setLastText] = React.useState<string>("");
+  const prompt = React.useMemo(
+    () => prompts[Math.floor(Math.random() * prompts.length)],
+    [prompts]
+  );
+
+  const [bezierShape, setBezierShape] = React.useState(getInputBezier());
+
+  const [lastBezierShape, setLastBezierShape] = React.useState(
+    getInputBezier()
+  );
 
   const [canvasSize, setCanvasSize] = React.useState<number>(300);
 
@@ -31,6 +44,8 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
           setLastStroke(JSON.parse(data.stroke));
           setLastColor(data.color);
           setColor(data.color);
+          setLastBezierShape(JSON.parse(data.bezierShape) || getInputBezier());
+          setBezierShape(JSON.parse(data.bezierShape) || getInputBezier());
           setLastText(data.text);
         });
       });
@@ -53,7 +68,9 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
         stroke: JSON.stringify(normalizeStroke),
         color,
         text,
+        bezierShape: JSON.stringify(bezierShape),
         createdAt: new Date(),
+        prompt,
       })
       .then(function (docRef) {
         console.log("Document written with IDs: ", docRef.id);
@@ -78,7 +95,14 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
               <About />
             </Route>
             <Route exact path="/language">
-              <TextResponse text={text} setText={setText} />
+              <TextResponse text={text} setText={setText} prompt={prompt} />
+            </Route>
+            <Route exact path="/color">
+              <ColorPicker
+                lastColor={lastColor}
+                color={color}
+                setColor={setColor}
+              />
             </Route>
             <Route exact path="/draw">
               <DrawingArea
@@ -93,10 +117,17 @@ export function App({ db }: { db: firebase.firestore.Firestore }) {
               />
             </Route>
             <Route exact path="/draw2">
-              <DrawingArea2 />
+              <DrawingArea2
+                lastBezierShape={lastBezierShape}
+                bezierShape={bezierShape}
+                setBezierShape={setBezierShape}
+              />
             </Route>
             <Route exact path="/output">
               <Output db={db} />
+            </Route>
+            <Route exact path="/output2">
+              <Output2 />
             </Route>
           </Switch>
         </div>

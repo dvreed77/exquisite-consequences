@@ -1,6 +1,8 @@
 import React from "react";
 import { path as d3Path } from "d3-path";
 import { Circle } from "./Circle";
+import { getInputBezier } from "../utils/getInitialBezierCurve";
+import { clone } from "ramda";
 
 function createPath(shape: any, scale = 1) {
   var path = d3Path();
@@ -29,50 +31,29 @@ function createPath(shape: any, scale = 1) {
 
   return path;
 }
-
-const padding = 0.1;
-const armLength = 0.3;
-
-const getInputBezier = () => [
-  {
-    pt: [0.5, padding],
-    armA: [0.5 - armLength, padding],
-    armB: [0.5 + armLength, padding],
-  },
-  {
-    pt: [1 - padding, 0.5],
-    armA: [1 - padding, 0.5 - armLength],
-    armB: [1 - padding, 0.5 + armLength],
-  },
-  {
-    pt: [0.5, 1 - padding],
-    armA: [0.5 + armLength, 1 - padding],
-    armB: [0.5 - armLength, 1 - padding],
-  },
-  {
-    pt: [padding, 0.5],
-    armA: [padding, 0.5 + armLength],
-    armB: [padding, 0.5 - armLength],
-  },
-];
-export function DrawingArea2({ inputPts }: { inputPts: number[] }) {
+interface IBezierPt {
+  pt: number[];
+  armA: number[];
+  armB: number[];
+}
+export function DrawingArea2({
+  lastBezierShape,
+  bezierShape,
+  setBezierShape,
+}: {
+  lastBezierShape: IBezierPt[];
+  bezierShape: IBezierPt[];
+  setBezierShape: any;
+}) {
   const svgRef = React.useRef<SVGSVGElement>(null);
   const [editPoints, setEditPoints] = React.useState(0);
   const [canvasSize, setCanvasSize] = React.useState<number>(1);
 
-  const maxEditPoints = 0.2;
-
-  const [circles, setCircles] = React.useState([
-    [100, 100],
-    [200, 200],
-  ]);
-
-  const [bezierShape, setBezierShape] = React.useState(getInputBezier());
+  const maxEditPoints = 0.4;
 
   const resetShape = () => {
-    // console.log(inputBezierShape);
     setEditPoints(0);
-    setBezierShape(getInputBezier());
+    setBezierShape(clone(lastBezierShape) || getInputBezier());
   };
 
   React.useEffect(() => {
@@ -131,7 +112,7 @@ export function DrawingArea2({ inputPts }: { inputPts: number[] }) {
       setEditPoints(curEditPoints);
 
       if (curEditPoints < maxEditPoints) {
-        setBezierShape((bezierShape) =>
+        setBezierShape((bezierShape: IBezierPt[]) =>
           bezierShape.map((pt, idx_) => {
             if (idx === idx_) {
               pt[ptT] = curPos;
@@ -176,6 +157,7 @@ export function DrawingArea2({ inputPts }: { inputPts: number[] }) {
 
   return (
     <div className="flex-grow flex flex-col select-none">
+      <h1 className="text-center">Edit this Shape!</h1>
       <div className="flex-grow select-none">
         <svg
           className="select-none"
@@ -183,6 +165,13 @@ export function DrawingArea2({ inputPts }: { inputPts: number[] }) {
           style={{ touchAction: "none" }}
         >
           <g>
+            <path
+              d={`${createPath(lastBezierShape, canvasSize).toString()}`}
+              fill="none"
+              stroke="#eee"
+              strokeWidth={2}
+              vectorEffect="non-scaling-stroke"
+            />
             <path
               d={`${createPath(bezierShape, canvasSize).toString()}`}
               fill="none"

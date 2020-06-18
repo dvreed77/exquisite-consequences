@@ -22,6 +22,12 @@ export function DrawingArea({
 }) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const [drawingOn, setDrawingOn] = React.useState(false);
+  const [startStop, setStartStop] = React.useState({
+    start: [0, 0],
+    stop: [0, 0],
+  });
+
+  const radius = 20;
 
   React.useEffect(() => {
     const canvas = canvasRef.current;
@@ -35,62 +41,65 @@ export function DrawingArea({
       canvas.width = clientSize;
       canvas.height = clientSize;
       setCanvasSize(clientSize);
-      drawCircles(clientSize);
+
+      const offset = 100;
+
+      const angle = 2 * Math.PI * Math.random();
+      const mx = clientSize / 2;
+      const my = clientSize / 2;
+      const r = clientSize / 2 - offset;
+
+      setStartStop({
+        start: [mx - r * Math.cos(angle), my - r * Math.sin(angle)],
+        stop: [mx + r * Math.cos(angle), my + r * Math.sin(angle)],
+      });
     }
   }, []);
 
-  React.useEffect(() => {
-    drawLast(lastStroke);
-  }, [lastStroke]);
+  function clear() {
+    const canvas = canvasRef?.current;
 
-  function drawCircles(clientSize: number) {
+    if (canvas) {
+      const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      drawCircles();
+      setStroke([]);
+    }
+  }
+
+  React.useEffect(() => {
+    clear();
+  }, [startStop]);
+
+  function drawCircles() {
     const canvas = canvasRef.current;
 
     if (canvas) {
       const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-      const offset = 100;
-      const radius = 20;
-      context.beginPath();
-      context.arc(offset, offset, radius, 0, 2 * Math.PI);
-      context.strokeStyle = "red";
-      context.lineWidth = 4;
-      context.stroke();
 
       context.beginPath();
       context.arc(
-        clientSize - offset,
-        clientSize - offset,
+        startStop.start[0],
+        startStop.start[1],
         radius,
         0,
         2 * Math.PI
       );
-      context.strokeStyle = "red";
+      context.strokeStyle = "green";
       context.lineWidth = 4;
       context.stroke();
+
+      context.strokeStyle = "red";
+      context.lineWidth = 4;
+      context.strokeRect(
+        startStop.stop[0] - radius,
+        startStop.stop[1] - radius,
+        2 * radius,
+        2 * radius
+      );
     }
   }
-  function drawLast(lastStroke: number[][]) {
-    if (!lastStroke || lastStroke.length === 0) return;
 
-    const canvas = canvasRef?.current;
-
-    if (canvas) {
-      const canvasWidth = canvas.width;
-      const expandedStroke = lastStroke.map(([x, y]) => [
-        x * (canvasWidth as number),
-        y * (canvasWidth as number),
-      ]);
-      const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-      context.beginPath();
-      context.moveTo(expandedStroke[0][0], expandedStroke[0][1]);
-      for (let i = 1; i < lastStroke.length; i++) {
-        context.lineTo(expandedStroke[i][0], expandedStroke[i][1]);
-      }
-
-      context.strokeStyle = "#ccc";
-      context.stroke();
-    }
-  }
   function startDrawing(event: React.TouchEvent | React.MouseEvent) {
     let cX, cY;
     event.persist();
@@ -112,22 +121,14 @@ export function DrawingArea({
       const offset = 100;
       const radius = 20;
 
-      const sX = offset;
-      const sY = offset;
+      const sX = startStop.start[0];
+      const sY = startStop.start[1];
 
       const d = Math.sqrt(Math.pow(x - sX, 2) + Math.pow(y - sY, 2));
 
       if (d < radius) {
         setStroke([]);
 
-        const canvas = canvasRef?.current;
-
-        if (canvas) {
-          const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-          context.clearRect(0, 0, canvas.width, canvas.height);
-          drawLast(lastStroke);
-          drawCircles(canvasSize);
-        }
         setDrawingOn(true);
       }
     }
@@ -154,27 +155,13 @@ export function DrawingArea({
       const offset = 100;
       const radius = 20;
 
-      const sX = canvasSize - offset;
-      const sY = canvasSize - offset;
+      const sX = startStop.stop[0];
+      const sY = startStop.stop[1];
 
       const d = Math.sqrt(Math.pow(x - sX, 2) + Math.pow(y - sY, 2));
 
-      console.log(d);
-      if (d < radius) {
-      } else {
-        console.log("deleting stroke");
-
-        const canvas = canvasRef?.current;
-
-        if (canvas) {
-          const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-
-          context.clearRect(0, 0, canvas.width, canvas.height);
-
-          drawCircles(canvasSize);
-
-          setStroke([]);
-        }
+      if (d > radius) {
+        clear();
       }
       setDrawingOn(false);
     }
@@ -216,9 +203,20 @@ export function DrawingArea({
       }
     }
   }
+
   return (
     <div className="flex-grow flex flex-col">
-      <h1>Draw a Line with a circle on the end</h1>
+      <h1 className="text-center">
+        Draw a Line or Curve from the{" "}
+        <span className="font-semibold" style={{ color: "green" }}>
+          Green
+        </span>{" "}
+        Circle to the{" "}
+        <span className="font-semibold" style={{ color: "red" }}>
+          Red
+        </span>{" "}
+        Square
+      </h1>
       <div className="flex-grow">
         <canvas
           className="border rounded select-none mx-auto"
@@ -233,7 +231,6 @@ export function DrawingArea({
           onTouchMove={draw}
           onMouseMove={draw}
         ></canvas>
-        <ColorPicker inputColor={lastColor} color={color} setColor={setColor} />
       </div>
     </div>
   );

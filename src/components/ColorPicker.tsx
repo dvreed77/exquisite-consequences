@@ -3,21 +3,25 @@ import classNames from "classnames";
 import { colorOptions } from "../utils/colorOptions";
 
 export function ColorPicker({
-  inputColor,
+  lastColor,
   color,
   setColor,
 }: {
-  inputColor: string;
+  lastColor: string;
   color: string;
   setColor: any;
 }) {
-  const colors = React.useMemo(() => colorOptions(inputColor || "red"), [
-    inputColor,
-  ]);
+  const [colors, setColors] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    const colors_ = colorOptions(lastColor || "red");
+    setColors(colors_);
+    setColor(colors_[Math.floor(Math.random() * colors.length)]);
+  }, [lastColor]);
 
   return (
     <div className="w-full">
-      <h1>Pick a Color</h1>
+      <h1 className="text-center">Pick a Color</h1>
       <div className="flex flex-row">
         {colors.map((c, idx) => (
           <div

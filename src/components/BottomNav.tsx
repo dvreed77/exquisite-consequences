@@ -35,6 +35,22 @@ export function BottomNav({ onSubmit }: { onSubmit: any }) {
           Back
         </Link>
         <Link
+          to={"/color"}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded leading-normal text-base ml-1"
+        >
+          Next
+        </Link>
+      </div>
+    ),
+    "/color": (
+      <div>
+        <Link
+          to={"/language"}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded leading-normal text-base mr-1"
+        >
+          Back
+        </Link>
+        <Link
           to={"/draw"}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded leading-normal text-base ml-1"
         >
@@ -45,7 +61,7 @@ export function BottomNav({ onSubmit }: { onSubmit: any }) {
     "/draw": (
       <div>
         <Link
-          to={"/language"}
+          to={"/color"}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded leading-normal text-base mr-1"
         >
           Back

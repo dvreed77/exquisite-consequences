@@ -1,4 +1,3 @@
-// index.tsx
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
@@ -6,6 +5,7 @@ import "./index.css";
 import firebase from "firebase/app";
 import "firebase/analytics";
 import "firebase/firestore";
+import "firebase/auth";
 
 import { App } from "./App";
 
@@ -21,6 +21,7 @@ const config = {
 };
 
 firebase.initializeApp(config);
+firebase.auth().signInAnonymously();
 firebase.analytics();
 var db = firebase.firestore();
 
